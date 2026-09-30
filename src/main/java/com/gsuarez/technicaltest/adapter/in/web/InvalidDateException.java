@@ -1,0 +1,8 @@
+package com.gsuarez.technicaltest.adapter.in.web;
+
+public class InvalidDateException extends RuntimeException {
+
+	public InvalidDateException(String message) {
+		super(message);
+	}
+}

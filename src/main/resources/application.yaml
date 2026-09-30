@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: technicaltest
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521/FREEPDB1
+    username: ${ORACLE_USER:hotel}
+    password: ${ORACLE_PASSWORD:hotel}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: hotel-availability-searches
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
