@@ -1,6 +1,5 @@
 package com.gsuarez.technicaltest.adapter.in.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gsuarez.technicaltest.application.port.in.HotelSearchUseCase;
 import com.gsuarez.technicaltest.domain.Search;
 import com.gsuarez.technicaltest.domain.SearchId;
@@ -11,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -39,14 +39,17 @@ class HotelControllerTest {
 		SearchId searchId = new SearchId("abc-123");
 		when(hotelSearchUseCase.search(any(Search.class))).thenReturn(searchId);
 
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String checkIn = LocalDate.now().plusDays(30).format(formatter);
+		String checkOut = LocalDate.now().plusDays(32).format(formatter);
 		String payload = """
 				{
 				  "hotelId": "1234aBc",
-				  "checkIn": "29/12/2023",
-				  "checkOut": "31/12/2023",
+				  "checkIn": "%s",
+				  "checkOut": "%s",
 				  "ages": [30, 29, 1, 3]
 				}
-				""";
+				""".formatted(checkIn, checkOut);
 
 		mockMvc.perform(post("/search")
 						.contentType(MediaType.APPLICATION_JSON)
@@ -201,8 +204,11 @@ class HotelControllerTest {
 	@Test
 	void countReturnsSearchAndCount() throws Exception {
 		SearchId searchId = new SearchId("abc-123");
+		LocalDate checkIn = LocalDate.now().plusDays(30);
+		LocalDate checkOut = LocalDate.now().plusDays(32);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		Search search = new Search(searchId, "1234aBc",
-				LocalDate.of(2023, 12, 29), LocalDate.of(2023, 12, 31),
+				checkIn, checkOut,
 				List.of(30, 29, 1, 3));
 		when(hotelSearchUseCase.count(any(SearchId.class)))
 				.thenReturn(new HotelSearchUseCase.CountResult(searchId, search, 100));
@@ -211,8 +217,8 @@ class HotelControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.searchId").value("abc-123"))
 				.andExpect(jsonPath("$.search.hotelId").value("1234aBc"))
-				.andExpect(jsonPath("$.search.checkIn").value("29/12/2023"))
-				.andExpect(jsonPath("$.search.checkOut").value("31/12/2023"))
+				.andExpect(jsonPath("$.search.checkIn").value(checkIn.format(formatter)))
+				.andExpect(jsonPath("$.search.checkOut").value(checkOut.format(formatter)))
 				.andExpect(jsonPath("$.search.ages[0]").value(1))
 				.andExpect(jsonPath("$.search.ages[1]").value(3))
 				.andExpect(jsonPath("$.search.ages[2]").value(29))

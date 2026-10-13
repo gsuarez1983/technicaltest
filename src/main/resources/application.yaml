@@ -19,3 +19,11 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       auto-offset-reset: earliest
+      max-poll-records: 100
+      max-poll-interval-ms: 300000
+    listener:
+      ack-mode: record
+      concurrency: 6
+  threads:
+    virtual:
+      enabled: true

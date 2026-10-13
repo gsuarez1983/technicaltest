@@ -5,8 +5,10 @@ import com.gsuarez.technicaltest.domain.Search;
 import com.gsuarez.technicaltest.domain.SearchId;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -27,6 +29,13 @@ public class SearchPersistenceAdapter implements SearchRepository {
 	@Override
 	public Optional<Search> findById(SearchId searchId) {
 		return jpaRepository.findBySearchId(searchId.value()).map(this::toDomain);
+	}
+
+	@Override
+	public Optional<Search> findByHotelIdAndDatesAndAges(String hotelId, LocalDate checkIn, LocalDate checkOut, List<Integer> ages) {
+		String serializedAges = serializeAges(ages);
+		return jpaRepository.findByHotelIdAndDatesAndAges(hotelId, checkIn, checkOut, serializedAges)
+				.map(this::toDomain);
 	}
 
 	@Override

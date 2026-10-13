@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class SearchPersistenceAdapterTest {
@@ -18,8 +17,10 @@ class SearchPersistenceAdapterTest {
 
 	@Test
 	void saveSerializesAgesSorted() {
+		LocalDate checkIn = LocalDate.now().plusDays(30);
+		LocalDate checkOut = LocalDate.now().plusDays(32);
 		Search search = new Search(new SearchId("id-1"), "1234aBc",
-				LocalDate.of(2023, 12, 29), LocalDate.of(2023, 12, 31),
+				checkIn, checkOut,
 				List.of(30, 29, 3, 1));
 
 		repository.save(search);
@@ -30,16 +31,18 @@ class SearchPersistenceAdapterTest {
 
 	@Test
 	void countEqualSearchesUsesSortedAges() {
+		LocalDate checkIn = LocalDate.now().plusDays(30);
+		LocalDate checkOut = LocalDate.now().plusDays(32);
 		Search search = new Search(new SearchId("id-1"), "1234aBc",
-				LocalDate.of(2023, 12, 29), LocalDate.of(2023, 12, 31),
+				checkIn, checkOut,
 				List.of(30, 29, 1, 3));
 
 		repository.countEqualSearches(search);
 
 		verify(jpaRepository).countEqualSearches(
-				eq("1234aBc"),
-				eq(LocalDate.of(2023, 12, 29)),
-				eq(LocalDate.of(2023, 12, 31)),
-				eq("1,3,29,30"));
+				"1234aBc",
+				checkIn,
+				checkOut,
+				"1,3,29,30");
 	}
 }

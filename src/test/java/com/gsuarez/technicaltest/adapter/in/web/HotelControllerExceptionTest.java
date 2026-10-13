@@ -24,6 +24,7 @@ class HotelControllerExceptionTest {
 	void setUp() {
 		hotelSearchUseCase = mock(HotelSearchUseCase.class);
 		mockMvc = MockMvcBuilders.standaloneSetup(new HotelController(hotelSearchUseCase))
+				.setControllerAdvice(new ValidationExceptionHandler())
 				.build();
 	}
 

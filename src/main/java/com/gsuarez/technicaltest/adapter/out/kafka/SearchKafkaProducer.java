@@ -3,7 +3,6 @@ package com.gsuarez.technicaltest.adapter.out.kafka;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gsuarez.technicaltest.application.port.out.SearchEventPublisher;
 import com.gsuarez.technicaltest.domain.Search;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 

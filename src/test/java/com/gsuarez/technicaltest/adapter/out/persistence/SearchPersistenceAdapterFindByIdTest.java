@@ -21,16 +21,18 @@ class SearchPersistenceAdapterFindByIdTest {
 	@Test
 	void findByIdReturnsSearchWhenExists() {
 		SearchEntity entity = new SearchEntity("id-1", "1234aBc",
-				LocalDate.of(2023, 12, 29), LocalDate.of(2023, 12, 31),
+				LocalDate.now().plusDays(30), LocalDate.now().plusDays(32),
 				"1,3,29,30", LocalDateTime.now());
 		when(jpaRepository.findBySearchId("id-1")).thenReturn(Optional.of(entity));
 
 		Optional<Search> result = repository.findById(new SearchId("id-1"));
 
-		assertTrue(result.isPresent());
-		assertEquals("id-1", result.get().searchId().value());
-		assertEquals("1234aBc", result.get().hotelId());
-		assertEquals(List.of(1, 3, 29, 30), result.get().ages());
+		assertAll("findById result",
+				() -> assertTrue(result.isPresent()),
+				() -> assertEquals("id-1", result.get().searchId().value()),
+				() -> assertEquals("1234aBc", result.get().hotelId()),
+				() -> assertEquals(List.of(1, 3, 29, 30), result.get().ages())
+		);
 	}
 
 	@Test

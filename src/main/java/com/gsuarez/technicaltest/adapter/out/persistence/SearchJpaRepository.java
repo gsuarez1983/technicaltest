@@ -22,4 +22,16 @@ public interface SearchJpaRepository extends JpaRepository<SearchEntity, String>
 			@Param("checkIn") LocalDate checkIn,
 			@Param("checkOut") LocalDate checkOut,
 			@Param("ages") String ages);
+
+	@Query("""
+			SELECT s FROM SearchEntity s
+			WHERE s.hotelId = :hotelId
+			  AND s.checkIn = :checkIn
+			  AND s.checkOut = :checkOut
+			  AND s.ages = :ages
+			""")
+	Optional<SearchEntity> findByHotelIdAndDatesAndAges(@Param("hotelId") String hotelId,
+			@Param("checkIn") LocalDate checkIn,
+			@Param("checkOut") LocalDate checkOut,
+			@Param("ages") String ages);
 }

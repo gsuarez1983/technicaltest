@@ -17,6 +17,9 @@ public record Search(
 		if (checkIn == null || checkOut == null) {
 			throw new IllegalArgumentException("checkIn and checkOut must not be null");
 		}
+		if (checkIn.isBefore(LocalDate.now())) {
+			throw new IllegalArgumentException("checkIn must not be in the past");
+		}
 		if (!checkOut.isAfter(checkIn)) {
 			throw new IllegalArgumentException("checkOut must be after checkIn");
 		}

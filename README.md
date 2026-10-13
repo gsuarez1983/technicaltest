@@ -62,6 +62,43 @@ curl -X POST http://localhost:8080/search \
 curl http://localhost:8080/count?searchId=<UUID>
 ```
 
+## Documentación API (Swagger / OpenAPI)
+
+### Swagger UI
+Interfaz visual para explorar y probar la API:
+```
+http://localhost:8080/swagger-ui.html
+```
+
+### OpenAPI Spec (JSON)
+```
+http://localhost:8080/v3/api-docs
+```
+
+### OpenAPI Spec (YAML)
+```
+http://localhost:8080/v3/api-docs.yaml
+```
+
+### Endpoints documentados
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `POST` | `/search` | Crea búsqueda de disponibilidad hotelera |
+| `GET` | `/count?searchId={id}` | Cuenta búsquedas equivalentes |
+
+### Validaciones automáticas
+- `hotelId`: alfanumérico, obligatorio
+- `checkIn` / `checkOut`: formato `dd/MM/yyyy`, checkOut > checkIn, checkIn no pasado
+- `ages`: lista no vacía, valores positivos
+
+### Códigos de respuesta
+| Endpoint | Código | Significado |
+|----------|--------|-------------|
+| `POST /search` | `202` | Búsqueda creada (retorna `searchId`) |
+| `POST /search` | `400` | Error de validación (ver `errors` en body) |
+| `GET /count` | `200` | Cuenta de búsquedas equivalentes |
+| `GET /count` | `404` | `searchId` no encontrado |
+
 ## Credenciales Oracle
 
 | Rol   | Usuario | Password | Service  |
@@ -94,18 +131,23 @@ com.gsuarez.technicaltest
 │   │       ├── CountResponse.java
 │   │       ├── SearchMapper.java
 │   │       ├── ValidationExceptionHandler.java
+│   │       ├── InvalidDateException.java
+│   │       ├── OpenApiConfig.java
 │   │       ├── DateFormat.java
 │   │       └── DateFormatValidator.java
 │   └── out
 │       ├── kafka
 │       │   ├── SearchKafkaProducer.java
-│       │   └── SearchKafkaConsumer.java
+│       │   ├── SearchKafkaConsumer.java
+│       │   ├── SearchPublishException.java
+│       │   ├── SearchConsumeException.java
+│       │   ├── KafkaTopicConfig.java
+│       │   ├── KafkaConsumerConfig.java
+│       │   └── JacksonConfig.java
 │       └── persistence
 │           ├── SearchEntity.java
 │           ├── SearchJpaRepository.java
 │           └── SearchPersistenceAdapter.java
-└── config
-    └── JacksonConfig.java
 ```
 
 ## Cobertura

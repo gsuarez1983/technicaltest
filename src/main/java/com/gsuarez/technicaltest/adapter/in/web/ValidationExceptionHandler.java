@@ -1,5 +1,6 @@
 package com.gsuarez.technicaltest.adapter.in.web;
 
+import com.gsuarez.technicaltest.application.service.SearchNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,15 +23,32 @@ public class ValidationExceptionHandler {
 		Map<String, String> errors = new LinkedHashMap<>();
 		ex.getBindingResult().getFieldErrors().forEach(error -> {
 			String field = normalizeField(error.getField());
-			errors.putIfAbsent(field, error.getDefaultMessage());
+			String message = error.getDefaultMessage();
+			errors.compute(field, (k, existing) -> existing == null || isBlankMessage(message) ? message : existing);
 		});
 		return Map.of("errors", errors);
+	}
+
+	private static boolean isBlankMessage(String message) {
+		return message != null && message.contains("must not be blank");
 	}
 
 	@ExceptionHandler(InvalidDateException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public Map<String, Object> handleInvalidDate(InvalidDateException ex) {
 		return Map.of("errors", Map.of("date", ex.getMessage()));
+	}
+
+	@ExceptionHandler(IllegalArgumentException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public Map<String, Object> handleIllegalArgument(IllegalArgumentException ex) {
+		return Map.of("errors", Map.of("validation", ex.getMessage()));
+	}
+
+	@ExceptionHandler(SearchNotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public Map<String, Object> handleSearchNotFound(SearchNotFoundException ex) {
+		return Map.of("errors", Map.of("search", ex.getMessage()));
 	}
 
 	private static String normalizeField(String field) {

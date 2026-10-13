@@ -5,6 +5,7 @@ import com.gsuarez.technicaltest.domain.SearchId;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,14 +14,19 @@ class SearchMapperTest {
 
 	@Test
 	void toDomainParsesValidRequest() {
-		SearchRequest request = new SearchRequest("1234aBc", "29/12/2023", "31/12/2023", List.of(30, 29, 1, 3));
+		LocalDate checkIn = LocalDate.now().plusDays(30);
+		LocalDate checkOut = LocalDate.now().plusDays(32);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		SearchRequest request = new SearchRequest("1234aBc", checkIn.format(formatter), checkOut.format(formatter), List.of(30, 29, 1, 3));
 
 		Search search = SearchMapper.toDomain(request);
 
-		assertEquals("1234aBc", search.hotelId());
-		assertEquals(LocalDate.of(2023, 12, 29), search.checkIn());
-		assertEquals(LocalDate.of(2023, 12, 31), search.checkOut());
-		assertEquals(List.of(30, 29, 1, 3), search.ages());
+		assertAll("toDomain",
+				() -> assertEquals("1234aBc", search.hotelId()),
+				() -> assertEquals(checkIn, search.checkIn()),
+				() -> assertEquals(checkOut, search.checkOut()),
+				() -> assertEquals(List.of(30, 29, 1, 3), search.ages())
+		);
 	}
 
 	@Test
@@ -32,7 +38,10 @@ class SearchMapperTest {
 
 	@Test
 	void toDomainWithSearchIdParsesCorrectly() {
-		Search search = SearchMapper.toDomain("id-1", "1234aBc", "29/12/2023", "31/12/2023", List.of(30, 29));
+		LocalDate checkIn = LocalDate.now().plusDays(30);
+		LocalDate checkOut = LocalDate.now().plusDays(32);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		Search search = SearchMapper.toDomain("id-1", "1234aBc", checkIn.format(formatter), checkOut.format(formatter), List.of(30, 29));
 
 		assertEquals("id-1", search.searchId().value());
 		assertEquals("1234aBc", search.hotelId());
@@ -40,15 +49,20 @@ class SearchMapperTest {
 
 	@Test
 	void toPayloadFormatsSearchWithSortedAges() {
+		LocalDate checkIn = LocalDate.now().plusDays(30);
+		LocalDate checkOut = LocalDate.now().plusDays(32);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		Search search = new Search(new SearchId("id-1"), "1234aBc",
-				LocalDate.of(2023, 12, 29), LocalDate.of(2023, 12, 31),
+				checkIn, checkOut,
 				List.of(30, 29, 1, 3));
 
 		CountResponse.SearchPayload payload = SearchMapper.toPayload(search);
 
-		assertEquals("1234aBc", payload.hotelId());
-		assertEquals("29/12/2023", payload.checkIn());
-		assertEquals("31/12/2023", payload.checkOut());
-		assertEquals(List.of(1, 3, 29, 30), payload.ages());
+		assertAll("toPayload",
+				() -> assertEquals("1234aBc", payload.hotelId()),
+				() -> assertEquals(checkIn.format(formatter), payload.checkIn()),
+				() -> assertEquals(checkOut.format(formatter), payload.checkOut()),
+				() -> assertEquals(List.of(1, 3, 29, 30), payload.ages())
+		);
 	}
 }

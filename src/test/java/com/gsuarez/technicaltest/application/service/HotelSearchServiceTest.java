@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class HotelSearchServiceTest {
@@ -24,7 +23,7 @@ class HotelSearchServiceTest {
 	@Test
 	void searchGeneratesIdAndPublishes() {
 		Search search = new Search(null, "1234aBc",
-				LocalDate.of(2023, 12, 29), LocalDate.of(2023, 12, 31),
+				LocalDate.now().plusDays(30), LocalDate.now().plusDays(32),
 				List.of(30, 29, 1, 3));
 
 		SearchId searchId = service.search(search);
@@ -38,16 +37,18 @@ class HotelSearchServiceTest {
 	void countReturnsResultFromRepository() {
 		SearchId searchId = new SearchId("abc-123");
 		Search search = new Search(searchId, "1234aBc",
-				LocalDate.of(2023, 12, 29), LocalDate.of(2023, 12, 31),
+				LocalDate.now().plusDays(30), LocalDate.now().plusDays(32),
 				List.of(30, 29, 1, 3));
 		when(repository.findById(searchId)).thenReturn(Optional.of(search));
 		when(repository.countEqualSearches(search)).thenReturn(100L);
 
 		HotelSearchUseCase.CountResult result = service.count(searchId);
 
-		assertEquals(100L, result.count());
-		assertEquals(search, result.search());
-		assertEquals(searchId, result.searchId());
+		assertAll("count result",
+				() -> assertEquals(100L, result.count()),
+				() -> assertEquals(search, result.search()),
+				() -> assertEquals(searchId, result.searchId())
+		);
 	}
 
 	@Test
@@ -56,5 +57,24 @@ class HotelSearchServiceTest {
 		when(repository.findById(searchId)).thenReturn(Optional.empty());
 
 		assertThrows(SearchNotFoundException.class, () -> service.count(searchId));
+	}
+
+	@Test
+	void searchReturnsExistingSearchIdWhenSameHotelDatesAndAges() {
+		SearchId existingSearchId = new SearchId("existing-id");
+		Search existingSearch = new Search(existingSearchId, "1234aBc",
+				LocalDate.now().plusDays(30), LocalDate.now().plusDays(32),
+				List.of(32, 35));
+		when(repository.findByHotelIdAndDatesAndAges("1234aBc", existingSearch.checkIn(), existingSearch.checkOut(), List.of(35, 32)))
+				.thenReturn(Optional.of(existingSearch));
+
+		Search newSearch = new Search(null, "1234aBc",
+				existingSearch.checkIn(), existingSearch.checkOut(),
+				List.of(35, 32));
+		SearchId result = service.search(newSearch);
+
+		assertEquals(existingSearchId, result);
+		verify(repository, never()).save(any());
+		verify(publisher, never()).publish(any());
 	}
 }

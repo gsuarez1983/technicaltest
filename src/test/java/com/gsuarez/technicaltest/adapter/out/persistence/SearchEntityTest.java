@@ -16,12 +16,14 @@ class SearchEntityTest {
 				LocalDate.of(2023, 12, 29), LocalDate.of(2023, 12, 31),
 				"1,3,29,30", now);
 
-		assertEquals("id-1", entity.getSearchId());
-		assertEquals("1234aBc", entity.getHotelId());
-		assertEquals(LocalDate.of(2023, 12, 29), entity.getCheckIn());
-		assertEquals(LocalDate.of(2023, 12, 31), entity.getCheckOut());
-		assertEquals("1,3,29,30", entity.getAges());
-		assertEquals(now, entity.getCreatedAt());
+		assertAll("SearchEntity",
+				() -> assertEquals("id-1", entity.getSearchId()),
+				() -> assertEquals("1234aBc", entity.getHotelId()),
+				() -> assertEquals(LocalDate.of(2023, 12, 29), entity.getCheckIn()),
+				() -> assertEquals(LocalDate.of(2023, 12, 31), entity.getCheckOut()),
+				() -> assertEquals("1,3,29,30", entity.getAges()),
+				() -> assertEquals(now, entity.getCreatedAt())
+		);
 	}
 
 	@Test

@@ -25,7 +25,7 @@ class SearchKafkaProducerExceptionTest {
 	@Test
 	void publishThrowsWhenKafkaFails() {
 		Search search = new Search(new SearchId("abc-123"), "1234aBc",
-				LocalDate.of(2023, 12, 29), LocalDate.of(2023, 12, 31),
+				LocalDate.now().plusDays(30), LocalDate.now().plusDays(32),
 				List.of(30, 29, 1, 3));
 		when(kafkaTemplate.send(eq(SearchKafkaProducer.TOPIC), anyString(), anyString()))
 				.thenThrow(new RuntimeException("Kafka unavailable"));

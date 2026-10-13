@@ -1,4 +1,4 @@
-package com.gsuarez.technicaltest.config;
+package com.gsuarez.technicaltest.adapter.out.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

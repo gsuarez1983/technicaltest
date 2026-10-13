@@ -22,9 +22,15 @@ public class HotelSearchService implements HotelSearchUseCase {
 	@Override
 	@Transactional
 	public SearchId search(Search search) {
-		Search searchWithId = search.withSearchId(SearchId.generate());
-		searchEventPublisher.publish(searchWithId);
-		return searchWithId.searchId();
+		return searchRepository.findByHotelIdAndDatesAndAges(
+				search.hotelId(), search.checkIn(), search.checkOut(), search.ages())
+			.map(Search::searchId)
+			.orElseGet(() -> {
+				Search searchWithId = search.withSearchId(SearchId.generate());
+				searchRepository.save(searchWithId);
+				searchEventPublisher.publish(searchWithId);
+				return searchWithId.searchId();
+			});
 	}
 
 	@Override
