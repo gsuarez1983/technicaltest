@@ -119,9 +119,12 @@ com.gsuarez.technicaltest
 │   │   │   └── HotelSearchUseCase.java
 │   │   └── out
 │   │       ├── SearchEventPublisher.java
-│   │       └── SearchRepository.java
+│   │       ├── SearchRepository.java
+│   │       └── TransactionRunner.java
 │   └── service
 │       └── HotelSearchService.java
+├── config
+│   └── ApplicationConfig.java
 ├── adapter
 │   ├── in
 │   │   └── web
@@ -147,7 +150,8 @@ com.gsuarez.technicaltest
 │       └── persistence
 │           ├── SearchEntity.java
 │           ├── SearchJpaRepository.java
-│           └── SearchPersistenceAdapter.java
+│           ├── SearchPersistenceAdapter.java
+│           └── TransactionAdapter.java
 ```
 
 ## Cobertura

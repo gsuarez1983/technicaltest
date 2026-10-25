@@ -3,13 +3,16 @@ package com.gsuarez.technicaltest.adapter.out.persistence;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "hotel_availability_search")
+@Table(name = "hotel_availability_search",
+		indexes = @Index(name = "idx_hotel_search_criteria",
+				columnList = "hotel_id, check_in, check_out, ages"))
 public class SearchEntity {
 
 	@Id

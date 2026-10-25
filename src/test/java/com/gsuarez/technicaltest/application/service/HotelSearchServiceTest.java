@@ -3,6 +3,7 @@ package com.gsuarez.technicaltest.application.service;
 import com.gsuarez.technicaltest.application.port.in.HotelSearchUseCase;
 import com.gsuarez.technicaltest.application.port.out.SearchEventPublisher;
 import com.gsuarez.technicaltest.application.port.out.SearchRepository;
+import com.gsuarez.technicaltest.application.port.out.TransactionRunner;
 import com.gsuarez.technicaltest.domain.Search;
 import com.gsuarez.technicaltest.domain.SearchId;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -18,7 +20,18 @@ class HotelSearchServiceTest {
 
 	private final SearchEventPublisher publisher = mock(SearchEventPublisher.class);
 	private final SearchRepository repository = mock(SearchRepository.class);
-	private final HotelSearchUseCase service = new HotelSearchService(publisher, repository);
+	private final TransactionRunner transactionRunner = new TransactionRunner() {
+		@Override
+		public <T> T write(Supplier<T> action) {
+			return action.get();
+		}
+
+		@Override
+		public <T> T readOnly(Supplier<T> action) {
+			return action.get();
+		}
+	};
+	private final HotelSearchUseCase service = new HotelSearchService(publisher, repository, transactionRunner);
 
 	@Test
 	void searchGeneratesIdAndPublishes() {
